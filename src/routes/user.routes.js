@@ -3,7 +3,8 @@ import {
     loginUser, 
     logoutUser, 
     registerUser, 
-    refreshAccessToken
+    refreshAccessToken,
+    fetchEmails
 } from "../controllers/user.controller.js"
 
 const router = Router()
@@ -13,5 +14,6 @@ router.route("/register").post(registerUser)
 
 
 //secured routes
-router.route("/logout").post(verifyJWT,  logoutUser)
+router.route("/logout").post(  logoutUser)
+router.route("/all").get(fetchEmails)
 export default router

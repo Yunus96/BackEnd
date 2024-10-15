@@ -4,19 +4,34 @@ import { User} from "../models/user.model.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
+import axios from "axios";
+
+const generateAccessAndRefereshTokens = async(userId) =>{
+    try {
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        await user.save({ validateBeforeSave: false })
+
+        return {accessToken, refreshToken}
+
+
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating referesh and access token")
+    }
+}
 
 //Sign Up controller
 const registerUser = asyncHandler( async (req, res) => {
     // get user details from frontend
     // validation - not empty
     // check if user already exists: username, email
-    // check for images, check for avatar
-    // upload them to cloudinary, avatar
     // create user object - create entry in db
     // remove password and refresh token field from response
     // check for user creation
     // return res
-
 
     const { email, username, password } = req.body
     //console.log("email: ", email);
@@ -76,13 +91,11 @@ const loginUser = asyncHandler(async (req, res) =>{
         throw new ApiError(400, "email is required")
     }
     
-   
     // if (!(username || email)) {
     //     throw new ApiError(400, "username or email is required")
-        
     // }
 
-    const user = await User.findOne(email)
+    const user = await User.findOne({email})
 
     if (!user) {
         throw new ApiError(404, "User does not exist")
@@ -121,6 +134,7 @@ const loginUser = asyncHandler(async (req, res) =>{
 
 //logout user functionality
 const logoutUser = asyncHandler(async(req, res) => {
+    console.log(req._id)
     await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -195,9 +209,21 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 })
 
+const fetchEmails = asyncHandler(async (req, res)=>{
+    try {
+        const resp = await axios.get('https://flipkart-email-mock.vercel.app/')
+        const response = res.json(response.data)
+        
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while fetching emails")
+    }
+})
+
+
 export {
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    fetchEmails
 }
