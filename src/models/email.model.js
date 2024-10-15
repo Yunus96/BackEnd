@@ -7,6 +7,21 @@ const emailSchema = new Schema({
         unique: true,
         index: true
     },
+    read: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    unread: {
+        type: Boolean,
+        required: true,
+        default: true
+    },
+    favourite: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     from: {
         type: String,
         required: true,
@@ -27,6 +42,9 @@ const emailSchema = new Schema({
         type: String,
         required: true
     }
+},
+{
+    timestamps: true
 })
 
 export const Email = mongoose.model("Email", emailSchema)
