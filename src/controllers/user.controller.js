@@ -235,18 +235,23 @@ const fetchEmails = asyncHandler(async (req, res)=>{
         }
 
         const emailStatusData = await Email.find();
-        
+        const mergedResults = []; // Array to hold merged results
+
         for(let i=0; i < actualArray.length; i++){
             const array1 = actualArray[i]
+
             const array2 = emailStatusData[i]
+
             const mergedArray = Object.assign({},array1,array2)
-            return mergedArray
+            mergedResults.push(mergedArray); // Add mergedArray to the results
         }
-
-
-        return res.status(201).json(new ApiResponse(200, mergedArray, "All emails fetched Successfully"))   
+        const sortedResult = mergedResults.map(
+            ({ id, from, date, subject, short_description, _doc : {read, unread, favourite, avatar }}) => ({ id, from, date, subject, short_description, read, unread, favourite, avatar  })
+        )
+       return res.status(200).json(new ApiResponse(200, sortedResult, "All emails fetched Successfully"))   
 
     } catch (error) {
+        console.log(error)
         throw new ApiError(500, "Something went wrong while fetching emails")
     }
 })
