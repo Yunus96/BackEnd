@@ -4,7 +4,8 @@ import {
     logoutUser, 
     registerUser, 
     refreshAccessToken,
-    fetchEmails
+    fetchEmails,
+    markAsFavourite
 } from "../controllers/user.controller.js"
 
 const router = Router()
@@ -16,4 +17,6 @@ router.route("/register").post(registerUser)
 //secured routes
 router.route("/logout").post(  logoutUser)
 router.route("/all").get(fetchEmails)
+router.route("/favourite").get(fetchEmails)
+
 export default router

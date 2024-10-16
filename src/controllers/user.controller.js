@@ -160,7 +160,6 @@ const logoutUser = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, {}, "User logged Out"))
 })
 
-
 //creating refresh access token
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
@@ -252,11 +251,32 @@ const fetchEmails = asyncHandler(async (req, res)=>{
     }
 })
 
+const markAsFavourite = asyncHandler(async (req, res) => {
+        try {
+                const {id} = req.params
+                console.log(id)
+                const result = await Email.findByIdAndUpdate(id, 
+                    {favourite: true}, 
+                    {new: true}
+                )
+
+                if (result === null) {
+                    return res.status(404).json(new ApiResponse(404, result, "id not found"))
+                }
+
+                return res.status(200).json(new ApiResponse(200, mergedArray, "add to favourite successfully"))  
+
+        } catch (error) {
+                throw new ApiError(500, "Something went wrong failed to mark as favourite")
+        }
+    } 
+)
 
 export {
     registerUser,
     loginUser,
     logoutUser,
     refreshAccessToken,
-    fetchEmails
+    fetchEmails,
+    markAsFavourite
 }
