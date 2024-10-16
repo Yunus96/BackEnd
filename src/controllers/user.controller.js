@@ -235,7 +235,7 @@ const fetchEmails = asyncHandler(async (req, res)=>{
         }
 
         const emailStatusData = await Email.find();
-        console.log({emailStatusData})
+        
         for(let i=0; i < actualArray.length; i++){
             const array1 = actualArray[i]
             const array2 = emailStatusData[i]
@@ -253,20 +253,26 @@ const fetchEmails = asyncHandler(async (req, res)=>{
 
 const markAsFavourite = asyncHandler(async (req, res) => {
         try {
-                const {id} = req.params
-                console.log(id)
-                const result = await Email.findByIdAndUpdate(id, 
-                    {favourite: true}, 
-                    {new: true}
+                const id = req.params.id
+                
+                const result = await Email.findOneAndUpdate({id}, 
+                    {
+                        $set:
+                        {favourite: true}
+                    }, 
+                    {
+                        returnDocument : 'after'
+                    }
                 )
 
                 if (result === null) {
                     return res.status(404).json(new ApiResponse(404, result, "id not found"))
                 }
 
-                return res.status(200).json(new ApiResponse(200, mergedArray, "add to favourite successfully"))  
+                return res.status(200).json(new ApiResponse(200, result, "add to favourite successfully"))  
 
         } catch (error) {
+            console.log(error)
                 throw new ApiError(500, "Something went wrong failed to mark as favourite")
         }
     } 

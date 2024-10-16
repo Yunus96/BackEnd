@@ -17,6 +17,6 @@ router.route("/register").post(registerUser)
 //secured routes
 router.route("/logout").post(  logoutUser)
 router.route("/all").get(fetchEmails)
-router.route("/favourite").get(fetchEmails)
+router.route("/:id").get(markAsFavourite)
 
 export default router
