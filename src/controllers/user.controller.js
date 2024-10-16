@@ -251,6 +251,60 @@ const fetchEmails = asyncHandler(async (req, res)=>{
     }
 })
 
+const fetchEmaildetail = asyncHandler(async (req, res) => {
+try {
+    const emailBodyRequest = await axios.get(`https://flipkart-email-mock.vercel.app/?id=${req.params.id}`)
+    const emailSender = await axios.get(`https://flipkart-email-mock.vercel.app`)
+    const emailSenderDetail = emailSender.data.list.find(item => item.id === req.params.id)
+    
+    //logic to get only email body without id
+   
+    //1. email body object
+    const emailBody = emailBodyRequest.data.body
+
+    //getting date and subject
+    var unixTime = emailSenderDetail.date
+    //2. human readable date
+    let readableDate = formatUnixTime(unixTime)
+    //3. email subject
+    let subject = emailSenderDetail.subject
+
+    // function to convert unix time milisecond to human readable
+    function formatUnixTime(unixTime) {
+        const date = new Date(emailSenderDetail.date * 1000) // Convert seconds to milliseconds
+    
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = date.getFullYear();
+    
+        let hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12; // Convert to 12-hour format
+        hours = hours ? String(hours).padStart(2, '0') : '12'; // The hour '0' should be '12'
+    
+        return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+    }
+
+    //code to get avatar and status of favourite
+    const id = req.params.id
+    const {favourite, avatar} = await Email.findOne({id})    
+
+    const data = {
+        id: req.params.id,
+        avatar,
+        readableDate,
+        subject,
+        favourite,
+        emailBody
+    }
+    return res.status(200).json(new ApiResponse(200, data, "Email details fetched successfully")) 
+} catch (error) {
+    throw new ApiError(500, "Something went wrong while fetching email detail")
+}
+})
+
+
 const markAsFavourite = asyncHandler(async (req, res) => {
         try {
                 const id = req.params.id
@@ -272,8 +326,7 @@ const markAsFavourite = asyncHandler(async (req, res) => {
                 return res.status(200).json(new ApiResponse(200, result, "add to favourite successfully"))  
 
         } catch (error) {
-            console.log(error)
-                throw new ApiError(500, "Something went wrong failed to mark as favourite")
+            throw new ApiError(500, "Something went wrong failed to mark as favourite")
         }
     } 
 )
@@ -284,5 +337,6 @@ export {
     logoutUser,
     refreshAccessToken,
     fetchEmails,
+    fetchEmaildetail,
     markAsFavourite
 }

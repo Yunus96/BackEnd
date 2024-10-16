@@ -5,6 +5,7 @@ import {
     registerUser, 
     refreshAccessToken,
     fetchEmails,
+    fetchEmaildetail,
     markAsFavourite
 } from "../controllers/user.controller.js"
 
@@ -18,5 +19,6 @@ router.route("/register").post(registerUser)
 router.route("/logout").post(  logoutUser)
 router.route("/all").get(fetchEmails)
 router.route("/:id").get(markAsFavourite)
+router.route("/detail/:id").get(fetchEmaildetail)
 
 export default router
