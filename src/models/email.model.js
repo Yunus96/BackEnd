@@ -2,7 +2,7 @@ import mongoose, {Schema} from "mongoose";
 
 const emailSchema = new Schema({
     id: {
-        type: Number,
+        type: String,
         required: true,
         unique: true,
         index: true

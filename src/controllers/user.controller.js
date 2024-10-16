@@ -216,7 +216,7 @@ const fetchEmails = asyncHandler(async (req, res)=>{
         const data = resp.data
         const emailArray = Object.entries(data)[0]
         const actualArray = emailArray.find(element => Array.isArray(element))
-     
+
         for(let i=0; i < actualArray.length; i++){
             const emailObject = actualArray[i]
             const idValue = Object.values(emailObject)[0]
@@ -229,14 +229,25 @@ const fetchEmails = asyncHandler(async (req, res)=>{
                     read: false,
                     unread: true,
                     favourite: false,
-                    name: name
+                    name: name,
+                    avatar: `https://ui-avatars.com/api/?name=${name}&size=128&background=e45065&color=ffffff&length=1&rounded=true`
                 })
             }
         }
 
-        res.json(data)   
+        const emailStatusData = await Email.find();
+        console.log({emailStatusData})
+        for(let i=0; i < actualArray.length; i++){
+            const array1 = actualArray[i]
+            const array2 = emailStatusData[i]
+            const mergedArray = Object.assign({},array1,array2)
+            return mergedArray
+        }
+
+
+        return res.status(201).json(new ApiResponse(200, mergedArray, "All emails fetched Successfully"))   
+
     } catch (error) {
-        console.log(error)
         throw new ApiError(500, "Something went wrong while fetching emails")
     }
 })
