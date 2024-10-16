@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/ApiError.js"
 import { User} from "../models/user.model.js"
+import { Email } from "../models/email.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
@@ -212,9 +213,30 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const fetchEmails = asyncHandler(async (req, res)=>{
     try {
         const resp = await axios.get('https://flipkart-email-mock.vercel.app/')
-        const response = res.json(response.data)
-        
+        const data = resp.data
+        const emailArray = Object.entries(data)[0]
+        const actualArray = emailArray.find(element => Array.isArray(element))
+     
+        for(let i=0; i < actualArray.length; i++){
+            const emailObject = actualArray[i]
+            const idValue = Object.values(emailObject)[0]
+            const isIdAvailable = await Email.findOne({id: idValue})
+            const name = Object.entries(emailObject)[1][1].name
+
+            if(isIdAvailable === null){
+                const email = await Email.create({
+                    id : idValue, 
+                    read: false,
+                    unread: true,
+                    favourite: false,
+                    name: name
+                })
+            }
+        }
+
+        res.json(data)   
     } catch (error) {
+        console.log(error)
         throw new ApiError(500, "Something went wrong while fetching emails")
     }
 })

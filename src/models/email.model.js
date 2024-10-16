@@ -2,45 +2,28 @@ import mongoose, {Schema} from "mongoose";
 
 const emailSchema = new Schema({
     id: {
-        type: String,
+        type: Number,
         required: true,
         unique: true,
         index: true
     },
     read: {
         type: Boolean,
-        required: true,
         default: false
     },
     unread: {
         type: Boolean,
-        required: true,
         default: true
     },
     favourite: {
         type: Boolean,
-        required: true,
         default: false
     },
-    from: {
-        type: String,
-        required: true,
-    },
     name: {
-        type: String,
-        required: true
+        type: String
     },
-    subject: {
+    avatar: {
         type: String,
-        required: true
-    },
-    short_description: {
-        type: String,
-        required: true
-    },
-    body: {
-        type: String,
-        required: true
     }
 },
 {
