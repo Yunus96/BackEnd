@@ -22,5 +22,6 @@ app.use("/api/v1/user", userRouter)
 app.use("/api/v1/emails", userRouter)
 app.use("/api/v1/email/", userRouter)
 app.use('/api/v1/favourite', userRouter)
+app.use("/api/v1/roc", userRouter)
 
 export { app }

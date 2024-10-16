@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { 
     loginUser, 
     logoutUser, 
@@ -6,19 +7,20 @@ import {
     refreshAccessToken,
     fetchEmails,
     fetchEmaildetail,
-    markAsFavourite
+    markAsFavourite,
+    rocAnalyticData
 } from "../controllers/user.controller.js"
 
 const router = Router()
 
 router.route("/login").post(loginUser)
 router.route("/register").post(registerUser)
-
-
-//secured routes
-router.route("/logout").post(  logoutUser)
 router.route("/all").get(fetchEmails)
 router.route("/:id").get(markAsFavourite)
 router.route("/detail/:id").get(fetchEmaildetail)
+
+//secured routes
+router.route("/logout").post(verifyJWT, logoutUser)
+router.route("/analytics").get(verifyJWT, rocAnalyticData)
 
 export default router

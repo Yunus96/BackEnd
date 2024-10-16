@@ -135,7 +135,7 @@ const loginUser = asyncHandler(async (req, res) =>{
 
 //logout user functionality
 const logoutUser = asyncHandler(async(req, res) => {
-    console.log(req._id)
+
     await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -209,7 +209,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 })
 
-const fetchEmails = asyncHandler(async (req, res)=>{
+const fetchEmails = asyncHandler(async (_, res)=>{
     try {
         const resp = await axios.get('https://flipkart-email-mock.vercel.app/')
         const data = resp.data
@@ -336,6 +336,10 @@ const markAsFavourite = asyncHandler(async (req, res) => {
     } 
 )
 
+const rocAnalyticData = asyncHandler(async (req, res) => {
+    
+})
+
 export {
     registerUser,
     loginUser,
@@ -343,5 +347,6 @@ export {
     refreshAccessToken,
     fetchEmails,
     fetchEmaildetail,
-    markAsFavourite
+    markAsFavourite,
+    rocAnalyticData
 }
