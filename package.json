@@ -4,6 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+      "start": "node index.js",
       "build": "react-scripts build",
       "vercel-build": "react-scripts build && cp -r build public",
       "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
