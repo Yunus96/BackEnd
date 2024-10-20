@@ -8,7 +8,8 @@ import {
     fetchEmails,
     fetchEmaildetail,
     markAsFavourite,
-    rocAnalyticData
+    rocAnalyticData,
+    getCurrentUser
 } from "../controllers/user.controller.js"
 
 const router = Router()
@@ -21,6 +22,7 @@ router.route("/detail/:id").get(fetchEmaildetail)
 
 //secured routes
 router.route("/logout").post(verifyJWT, logoutUser)
+router.route('/user').get(getCurrentUser)
 router.route("/analytics").get(verifyJWT, rocAnalyticData)
 
 export default router

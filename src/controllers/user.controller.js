@@ -35,7 +35,6 @@ const registerUser = asyncHandler( async (req, res) => {
     // return res
 
     const { email, username, password } = req.body
-    //console.log("email: ", email);
 
     if (
         [email, username, password].some((field) => field?.trim() === "")
@@ -51,13 +50,11 @@ const registerUser = asyncHandler( async (req, res) => {
     //console.log(req.files);
 
     //const avatarLocalPath = req.files?.avatar[0]?.path;
-    //const coverImageLocalPath = req.files?.coverImage[0]?.path;
-   
 
     const user = await User.create({
         email, 
         password,
-        username: username.toLowerCase()
+        username: username
     })
 
     const createdUser = await User.findById(user._id).select(
@@ -83,8 +80,7 @@ const loginUser = asyncHandler(async (req, res) =>{
     //password check
     //access and referesh token
     //send cookie
-
-    const {email, username, password} = req.body
+    const {email, password} = req.body
 
     if (!email) {
         throw new ApiError(400, "email is required")
@@ -157,6 +153,12 @@ const logoutUser = asyncHandler(async(req, res) => {
     .clearCookie("refreshToken", options)
     .json(new ApiResponse(200, {}, "User logged Out"))
 })
+
+const getCurrentUser = asyncHandler(async(req, res) => {
+    console.log(req.user)
+    return res.json(req.user)
+})
+
 
 //creating refresh access token
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -243,10 +245,27 @@ const fetchEmails = asyncHandler(async (_, res)=>{
             const mergedArray = Object.assign({},array1,array2)
             mergedResults.push(mergedArray); // Add mergedArray to the results
         }
+
+        // function to convert unix time milisecond to human readable
+        function formatUnixTime(unixTime) {
+        //const date = new Date(emailSenderDetail.date * 1000) // Convert seconds to milliseconds
+        const date = unixTime.toString().length === 10 ? new Date(unixTime * 1000) : new Date(unixTime);
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = date.getFullYear();
+    
+        let hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12; // Convert to 12-hour format
+        hours = hours ? String(hours).padStart(2, '0') : '12'; // The hour '0' should be '12'
+        return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+    }
         const sortedResult = mergedResults.map(
-            ({ id, from, date, subject, short_description, _doc : {read, unread, favourite, avatar }}) => ({ id, from, date, subject, short_description, read, unread, favourite, avatar  })
+            ({ id, from, date, subject, short_description, _doc : {read, unread, favourite, avatar }}) => ({ id, from, date: formatUnixTime(date), subject, short_description, read, unread, favourite, avatar  })
         )
-       return res.status(200).json(new ApiResponse(200, sortedResult, "All emails fetched Successfully"))   
+       return res.json(sortedResult)   
 
     } catch (error) {
         console.log(error)
@@ -259,7 +278,7 @@ try {
     const emailBodyRequest = await axios.get(`https://flipkart-email-mock.vercel.app/?id=${req.params.id}`)
     const emailSender = await axios.get(`https://flipkart-email-mock.vercel.app`)
     const emailSenderDetail = emailSender.data.list.find(item => item.id === req.params.id)
-    
+    console.log(emailSenderDetail)
     //logic to get only email body without id
    
     //1. email body object
@@ -274,8 +293,9 @@ try {
 
     // function to convert unix time milisecond to human readable
     function formatUnixTime(unixTime) {
-        const date = new Date(emailSenderDetail.date * 1000) // Convert seconds to milliseconds
-    
+        //const date = new Date(emailSenderDetail.date * 1000) // Convert seconds to milliseconds
+        const date = unixTime.toString().length === 10 ? new Date(unixTime * 1000) : new Date(unixTime);
+
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
         const year = date.getFullYear();
@@ -311,11 +331,16 @@ try {
 const markAsFavourite = asyncHandler(async (req, res) => {
         try {
                 const id = req.params.id
+
+                const email = await Email.findOne({ id });   
                 
+                // Toggle the favourite status
+                const newFavouriteStatus = !email.favourite;
+
                 const result = await Email.findOneAndUpdate({id}, 
                     {
                         $set:
-                        {favourite: true}
+                        {favourite: newFavouriteStatus}
                     }, 
                     {
                         returnDocument : 'after'
@@ -346,5 +371,6 @@ export {
     fetchEmails,
     fetchEmaildetail,
     markAsFavourite,
-    rocAnalyticData
+    rocAnalyticData,
+    getCurrentUser
 }
