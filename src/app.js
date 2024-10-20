@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 app.use(cors({
-    origin: "https://scintillating-gnome-7bea21.netlify.app/",
+    origin: "http://scintillating-gnome-7bea21.netlify.app",
     credentials: true
 }))
 
